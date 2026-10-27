@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <title>UNQ · Gobernanza estudiantil</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="UNQ Gobernanza, inicio">
+          <span class="brand-mark">U</span>
+          <span class="brand-copy"><strong>UNQ</strong><small>Gobernanza estudiantil</small></span>
+        </a>
+        <div class="topbar-actions">
+          <span class="network-pill"><span class="network-dot"></span>Sepolia</span>
+          <button class="button button-primary" id="connectButton" type="button">Conectar wallet</button>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="hero panel">
+          <div class="hero-copy">
+            <p class="eyebrow">Universidad Nacional de Quilmes</p>
+            <h1>Tu voz también<br /><span>construye la UNQ.</span></h1>
+            <p class="hero-description">Consultá propuestas, participá con tu credencial estudiantil y seguí cada decisión de forma transparente.</p>
+            <div class="hero-actions">
+              <button class="button button-primary button-large" id="heroConnectButton" type="button">Conectar wallet</button>
+              <button class="button button-secondary button-large" id="refreshButton" type="button" hidden>Actualizar datos</button>
+            </div>
+            <div class="wallet-status" id="walletStatus" role="status" aria-live="polite">Conectá MetaMask para consultar tu credencial y las propuestas.</div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <div class="vote-card"><span class="vote-card-label">UNQ · DAO</span><span class="vote-card-check">✓</span><strong>Una comunidad,<br />muchas ideas.</strong><span class="vote-card-line"></span><span class="vote-card-line short"></span></div>
+            <span class="floating-dot dot-one"></span><span class="floating-dot dot-two"></span><span class="floating-dot dot-three"></span>
+          </div>
+        </section>
+
+        <section class="steps-section" aria-labelledby="stepsTitle">
+          <div class="section-heading compact-heading"><div><p class="eyebrow">Cómo participar</p><h2 id="stepsTitle">Tres pasos, sin vueltas</h2></div></div>
+          <div class="steps-grid">
+            <article class="step-card"><span class="step-number">01</span><div><h3>Conectá tu wallet</h3><p>Usá MetaMask en la red Sepolia para entrar a la plataforma.</p></div></article>
+            <article class="step-card"><span class="step-number">02</span><div><h3>Validá tu credencial</h3><p>Necesitás un SBT UNQ. La universidad lo emite a tu dirección.</p></div></article>
+            <article class="step-card"><span class="step-number">03</span><div><h3>Participá y votá</h3><p>Tu saldo de UNQC determina el peso de tu voto en cada propuesta.</p></div></article>
+          </div>
+        </section>
+
+        <div class="notice notice-info" id="networkNotice" hidden></div>
+        <div class="notice" id="globalNotice" role="status" aria-live="polite" hidden></div>
+
+        <section class="dashboard" id="dashboard" hidden>
+          <div class="section-heading dashboard-heading">
+            <div><p class="eyebrow">Tu espacio</p><h2>Panel de participación</h2><p class="muted" id="connectedAccount"></p></div>
+            <span class="role-chip" id="roleChip">Wallet conectada</span>
+          </div>
+
+          <div class="summary-grid">
+            <article class="summary-card"><div class="summary-icon icon-credential">✦</div><span class="summary-label">Credencial UNQ</span><strong id="credentialValue">—</strong><small id="credentialHint">Conectá tu wallet para consultar</small></article>
+            <article class="summary-card"><div class="summary-icon icon-token">◈</div><span class="summary-label">Saldo de UNQC</span><strong id="tokenBalance">—</strong><small>Tokens de gobernanza</small></article>
+            <article class="summary-card"><div class="summary-icon icon-vote">◎</div><span class="summary-label">Peso de voto</span><strong id="votingPower">—</strong><small>Votos por propuesta</small></article>
+          </div>
+
+          <section class="admin-section panel" id="adminSection" hidden>
+            <div class="section-heading">
+              <div><p class="eyebrow">Administración UNQ</p><h2>Emitir credenciales y tokens</h2><p class="muted">Estas acciones requieren la wallet autorizada de la universidad o un faucet autorizado.</p></div>
+              <span class="role-chip role-chip-admin">Acceso de administración</span>
+            </div>
+            <div class="admin-grid">
+              <form class="form-card" id="mintSbtForm" hidden>
+                <div class="form-card-heading"><span class="form-icon">✦</span><div><h3>Emitir credencial SBT</h3><p>Asigná una credencial intransferible a un estudiante validado.</p></div></div>
+                <label for="sbtRecipient">Dirección pública del estudiante</label>
+                <input id="sbtRecipient" name="recipient" type="text" autocomplete="off" spellcheck="false" placeholder="0x…" required />
+                <p class="field-help">Verificá la identidad del estudiante antes de emitirla.</p>
+                <button class="button button-primary form-submit" type="submit">Emitir SBT</button>
+                <p class="form-feedback" id="sbtFeedback" role="status" aria-live="polite"></p>
+              </form>
+
+              <form class="form-card" id="mintTokenForm" hidden>
+                <div class="form-card-heading"><span class="form-icon token-form-icon">◈</span><div><h3>Asignar UNQC</h3><p>Solo se puede asignar a una wallet con SBT.</p></div></div>
+                <label for="tokenRecipient">Dirección pública del estudiante</label>
+                <input id="tokenRecipient" name="recipient" type="text" autocomplete="off" spellcheck="false" placeholder="0x…" required />
+                <label for="tokenAmount">Cantidad de UNQC</label>
+                <input id="tokenAmount" name="amount" type="number" min="1" max="1000000000" step="1" inputmode="numeric" placeholder="100" required />
+                <p class="field-help">Ingresá tokens enteros. Ejemplo: 100 asigna 100 UNQC.</p>
+                <button class="button button-primary form-submit" type="submit">Asignar tokens</button>
+                <p class="form-feedback" id="tokenFeedback" role="status" aria-live="polite"></p>
+              </form>
+            </div>
+            <p class="admin-footnote">Las transacciones deben ser confirmadas en MetaMask y consumen Sepolia ETH para el gas.</p>
+          </section>
+
+          <section class="create-section panel" id="createSection">
+            <div class="section-heading">
+              <div><p class="eyebrow">Propuestas</p><h2>Presentá una idea</h2><p class="muted">El detalle debe estar publicado en IPFS o en una página accesible.</p></div>
+              <span class="permission-note" id="proposalPermission">Requiere credencial SBT</span>
+            </div>
+            <form id="createProposalForm" class="proposal-form">
+              <div class="form-field form-field-wide"><label for="proposalUri">Enlace o URI del detalle</label><input id="proposalUri" type="text" maxlength="512" placeholder="ipfs://… o https://…" required /><small>La DAO guarda este enlace; no sube archivos a IPFS.</small></div>
+              <div class="form-field"><label for="proposalDuration">Duración de la votación</label><div class="input-suffix"><input id="proposalDuration" type="number" min="1" max="525600" step="1" value="1" required /><span>minutos</span></div><small>Para una demo, podés usar 1 minuto.</small></div>
+              <div class="form-field form-field-button"><button class="button button-primary" id="createProposalButton" type="submit">Crear propuesta</button></div>
+            </form>
+            <p class="form-feedback" id="proposalFeedback" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="proposals-section" aria-labelledby="proposalsTitle">
+            <div class="section-heading proposal-list-heading"><div><p class="eyebrow">En la comunidad</p><h2 id="proposalsTitle">Propuestas</h2></div><span class="count-chip" id="proposalCountLabel">0 propuestas</span></div>
+            <div class="empty-state" id="emptyProposals"><span class="empty-icon">◎</span><h3>Todavía no hay propuestas</h3><p>Cuando se publique una, aparecerá acá para que puedas participar.</p></div>
+            <div class="proposal-list" id="proposalList"></div>
+          </section>
+        </section>
+
+        <footer class="footer"><span>UNQ · Gobernanza estudiantil</span><span>Red de prueba Sepolia</span></footer>
+      </main>
+    </div>
+    <template id="proposalTemplate">
+      <article class="proposal-card">
+        <div class="proposal-card-top"><span class="proposal-id"></span><span class="proposal-status"></span></div>
+        <h3 class="proposal-title"></h3>
+        <a class="proposal-link" target="_blank" rel="noopener noreferrer" hidden></a>
+        <div class="vote-totals"><div><span>A favor</span><strong class="votes-for">0</strong></div><div><span>En contra</span><strong class="votes-against">0</strong></div></div>
+        <div class="vote-track"><span class="vote-track-for"></span></div>
+        <div class="proposal-meta"><span class="proposal-time"></span><span class="proposal-proposer"></span></div>
+        <div class="proposal-actions"></div>
+      </article>
+    </template>
+  </body>
+</html>
